@@ -78,33 +78,6 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initial setup
     applyOddEvenClasses();
     
-    // --- Model Card Animations ---
-    const cards = document.querySelectorAll('.model-card');
-    
-    if (cards.length) {
-        const cardObserver = new IntersectionObserver(
-            entries => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        setTimeout(() => {
-                            entry.target.style.opacity = '1';
-                            entry.target.style.transform = 'translateY(0)';
-                        }, entry.target.dataset.index * 100);
-                        cardObserver.unobserve(entry.target);
-                    }
-                });
-            },
-            { threshold: 0.1, rootMargin: '0px 0px -50px 0px' }
-        );
-        
-        cards.forEach((card, index) => {
-            card.style.opacity = '0';
-            card.style.transform = 'translateY(30px)';
-            card.dataset.index = index;
-            cardObserver.observe(card);
-        });
-    }
-    
     // --- Table row hover effects ---
     dataRows.forEach(row => {
         row.addEventListener('mouseenter', () => {
