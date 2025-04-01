@@ -138,18 +138,20 @@
             width: 100%;
             background-color: #ffffff;
             color: #1A2036;
-            border-radius: 12px;
+            border-radius: 16px;
             overflow: hidden;
-            box-shadow: 0 4px 20px -8px rgba(0, 0, 0, 0.07);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
         }
         
         .premium-table th {
-            background-color: #F7F9FC;
-            color: #4B5563;
+            background: linear-gradient(180deg, #F8FAFC 0%, #F1F5F9 100%);
+            color: #475569;
             font-weight: 600;
-            padding: 16px;
+            padding: 18px 16px;
             text-align: center;
             border-bottom: 1px solid #E2E8F0;
+            letter-spacing: 0.02em;
+            position: relative;
         }
         
         .premium-table th:first-child {
@@ -157,8 +159,18 @@
             padding-left: 20px;
         }
         
+        .premium-table th:not(:last-child)::after {
+            content: '';
+            position: absolute;
+            top: 25%;
+            right: 0;
+            height: 50%;
+            width: 1px;
+            background-color: rgba(226, 232, 240, 0.7);
+        }
+        
         .premium-table td {
-            padding: 14px 16px;
+            padding: 16px;
             vertical-align: middle;
             border-bottom: 1px solid #F1F5F9;
             font-size: 0.9rem;
@@ -176,37 +188,36 @@
         /* Enhanced "Best" cell styling */
         .best-cell {
             position: relative;
+            overflow: hidden;
         }
         
-        .best-cell::before {
+        .best-cell::after {
             content: '';
             position: absolute;
-            inset: 0;
-            border-radius: 4px;
-            z-index: 0;
-            opacity: 0.7;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at center, rgba(255, 255, 255, 0.8) 0%, transparent 70%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
         }
         
-        .best-cell.chatgpt-best::before { background: linear-gradient(135deg, rgba(167, 243, 208, 0.2) 0%, rgba(167, 243, 208, 0.4) 100%); }
-        .best-cell.claude-best::before { background: linear-gradient(135deg, rgba(254, 215, 170, 0.2) 0%, rgba(254, 215, 170, 0.4) 100%); }
-        .best-cell.grok-best::before { background: linear-gradient(135deg, rgba(233, 213, 255, 0.2) 0%, rgba(233, 213, 255, 0.4) 100%); }
-        .best-cell.gemini-best::before { background: linear-gradient(135deg, rgba(191, 219, 254, 0.2) 0%, rgba(191, 219, 254, 0.4) 100%); }
-        .best-cell.perplexity-best::before { background: linear-gradient(135deg, rgba(153, 246, 228, 0.2) 0%, rgba(153, 246, 228, 0.4) 100%); }
-        
-        .best-cell > span {
-            position: relative;
-            z-index: 1;
+        .best-cell:hover::after {
+            opacity: 1;
         }
         
         /* Category headers */
         .category-header {
-            background: linear-gradient(90deg, #F1F5F9, #F8FAFC);
-            font-size: 0.75rem;
+            background: linear-gradient(90deg, #EEF2FF, #F8FAFD);
+            font-size: 0.7rem;
             font-weight: 700;
-            letter-spacing: 0.05em;
+            letter-spacing: 0.06em;
             text-transform: uppercase;
-            color: #64748B;
-            padding: 10px 20px;
+            color: #6366F1;
+            padding: 12px 20px;
+            border-top: 1px solid rgba(99, 102, 241, 0.1);
         }
         
         /* Sticky elements */
@@ -214,20 +225,23 @@
             position: sticky;
             top: 0;
             z-index: 20;
-            background-color: #F7F9FC;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.03);
         }
         
         .sticky-col {
             position: sticky;
             left: 0;
             z-index: 10;
-            background-color: #ffffff;
             border-right: 1px solid #F1F5F9;
         }
         
-        /* Alternating row styles */
-        tr.even-row > .sticky-col { background-color: #FAFBFF; }
-        tr.odd-row > .sticky-col { background-color: #ffffff; }
+        /* Alternating row styles with subtle gradient */
+        tr.odd-row > td {
+            background: linear-gradient(90deg, #FFFFFF 0%, #FAFBFF 100%);
+        }
+        tr.even-row > td {
+            background: linear-gradient(90deg, #F9FAFC 0%, #F3F6FF 100%);
+        }
         
         /* Category header when sticky */
         .sticky-col.category {
@@ -235,22 +249,16 @@
             z-index: 15;
         }
         
-        /* Enhanced hover effects */
-        tbody tr:not([class*="category"]):hover {
+        /* Modern hover effect with subtle shadow */
+        tbody tr:not([class*="category"]):hover > td {
             background-color: #F5F7FF;
-        }
-        
-        tbody tr:not([class*="category"]):hover > .sticky-col {
-            background-color: #F5F7FF;
+            box-shadow: inset 0 0 0 9999px rgba(99, 102, 241, 0.04);
         }
         
         /* Highlighted rows */
-        tr.highlighted {
-            background-color: #FFF7ED !important;
-        }
-        
-        tr.highlighted > .sticky-col {
-            background-color: #FFF7ED !important;
+        tr.highlighted > td {
+            background: linear-gradient(90deg, #FFF7ED 0%, #FFF4E6 100%) !important;
+            box-shadow: inset 0 0 0 9999px rgba(249, 115, 22, 0.02) !important;
         }
         
         /* Premium buttons */
@@ -359,6 +367,69 @@
             margin-bottom: 8px;
             display: block;
         }
+        
+        .compact-legend {
+            position: absolute;
+            bottom: 15px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(8px);
+            border-radius: 30px;
+            padding: 6px 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            border: 1px solid rgba(226, 232, 240, 0.7);
+            z-index: 5;
+        }
+        
+        .compact-legend-item {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 0.75rem;
+            color: #64748B;
+        }
+        
+        .compact-legend .indicator,
+        .compact-legend .indicator-best {
+            font-size: 0.95rem;
+        }
+        
+        /* New modern styling for indicators */
+        .indicator {
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            height: 24px;
+            width: 24px;
+            border-radius: 50%;
+            background: white;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        
+        .indicator-best {
+            font-size: 1.5rem;
+            filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.1));
+            animation: subtle-pulse 2s infinite alternate;
+        }
+        
+        @keyframes subtle-pulse {
+            0% { transform: scale(1); }
+            100% { transform: scale(1.08); }
+        }
+        
+        tr:hover .indicator {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* Remove the old legend styling as we're moving it */
+        #legend {
+            display: none;
+        }
     </style>
 </head>
 <body>
@@ -375,6 +446,17 @@
                         A simple guide to help you choose the right AI for your needs, comparing key features across top AI models.
                     </p>
                     
+                    <div class="compact-legend">
+                        <div class="compact-legend-item">
+                            <span class="indicator-best">⭐</span> Best
+                        </div>
+                        <div class="compact-legend-item">
+                            <span class="indicator">✅</span> Yes
+                        </div>
+                        <div class="compact-legend-item">
+                            <span class="indicator">❌</span> No
+                        </div>
+                    </div>
                 </div>
             </div>
             
@@ -632,131 +714,108 @@
             const formatter = new Intl.DateTimeFormat('en-US', { month: 'long', year: 'numeric' });
             lastUpdated.textContent = 'Last updated: ' + formatter.format(now);
             
-            // --- Filter and Interactive Components ---
-            const table = document.getElementById('comparison-table');
+            // --- Core Table Functionality ---
+            const table = document.getElementById('capabilities-table');
             const tableBody = table.querySelector('tbody');
-            // Select only data rows, excluding category headers
             const dataRows = Array.from(tableBody.querySelectorAll('tr')).filter(row => !row.querySelector('td.category'));
             const filterButtonsContainer = document.getElementById('use-case-filters');
-            const filterButtons = filterButtonsContainer.querySelectorAll('.use-case-button');
-            const legendItems = document.querySelectorAll('#legend .legend-item');
+            const filterButtons = filterButtonsContainer?.querySelectorAll('.use-case-button');
 
-            // --- Use Case Filtering ---
-            filterButtonsContainer.addEventListener('click', function(event) {
-                if (event.target.classList.contains('use-case-button')) {
+            // --- Use Case Filtering (if present) ---
+            if (filterButtonsContainer) {
+                filterButtonsContainer.addEventListener('click', function(event) {
+                    if (!event.target.classList.contains('use-case-button')) return;
+                    
                     const button = event.target;
                     const capabilityFilter = button.getAttribute('data-capability');
-
+                    
                     // Update active button state
                     filterButtons.forEach(btn => btn.classList.remove('active'));
                     button.classList.add('active');
-
+                    
                     // Filter rows with animation
                     dataRows.forEach(row => {
                         const capabilityCell = row.querySelector('td:first-child');
-                        const capabilityText = capabilityCell ? capabilityCell.textContent.trim() : '';
-
-                        // Reset highlights first
+                        const capabilityText = capabilityCell?.textContent.trim() || '';
+                        
+                        // Reset highlights
                         row.classList.remove('highlighted');
-
+                        
                         if (capabilityFilter === 'all' || capabilityText === capabilityFilter) {
-                            // Show row with animation
                             row.style.display = '';
                             if (capabilityFilter !== 'all') {
-                                row.classList.add('highlighted'); // Highlight matching row
+                                row.classList.add('highlighted');
                             }
                         } else {
-                            // Hide row
                             row.style.display = 'none';
                         }
                     });
-                     // Reapply odd/even classes after filtering to maintain sticky col style
-                     applyOddEvenClasses();
-                }
-            });
+                    
+                    applyOddEvenClasses();
+                });
+            }
 
-            // --- Interactive Legend ---
-            legendItems.forEach(item => {
-                item.addEventListener('click', function() {
-                    const type = item.getAttribute('data-type');
-                    const indicators = tableBody.querySelectorAll(`[data-indicator="${type}"]`);
+            // --- Apply odd/even classes for zebra striping ---
+            function applyOddEvenClasses() {
+                let isOdd = true;
+                const visibleRows = Array.from(tableBody.querySelectorAll('tr')).filter(
+                    row => !row.querySelector('td.category') && row.style.display !== 'none'
+                );
+                
+                visibleRows.forEach(row => {
+                    row.classList.remove('odd-row', 'even-row');
+                    row.classList.add(isOdd ? 'odd-row' : 'even-row');
+                    
+                    // Add data attribute if needed
+                    if (!row.hasAttribute('data-capability-row')) {
+                        const text = row.querySelector('td:first-child')?.textContent.trim();
+                        if (text) row.setAttribute('data-capability-row', text);
+                    }
+                    
+                    isOdd = !isOdd;
+                });
+            }
 
-                    const isHighlighting = !item.classList.contains('legend-active');
-
-                    // Remove active state and highlights from all legend items and indicators first
-                    legendItems.forEach(i => i.classList.remove('legend-active'));
-                    tableBody.querySelectorAll('.legend-highlight').forEach(el => el.classList.remove('legend-highlight'));
-
-                    if (isHighlighting) {
-                        item.classList.add('legend-active');
-                        indicators.forEach(indicator => {
-                            // Highlight the parent cell (td)
-                            indicator.closest('td').classList.add('legend-highlight');
+            // Initial setup
+            applyOddEvenClasses();
+            dataRows.forEach(row => row.classList.add('smooth-transition'));
+            
+            // --- Model Card Animations ---
+            const cards = document.querySelectorAll('.model-card');
+            
+            if (cards.length) {
+                const cardObserver = new IntersectionObserver(
+                    entries => {
+                        entries.forEach(entry => {
+                            if (entry.isIntersecting) {
+                                entry.target.style.opacity = '1';
+                                entry.target.style.transform = 'translateY(0)';
+                                cardObserver.unobserve(entry.target);
+                            }
                         });
+                    },
+                    { threshold: 0.1, rootMargin: '0px 0px -50px 0px' }
+                );
+                
+                cards.forEach((card, index) => {
+                    card.style.opacity = '0';
+                    card.style.transform = 'translateY(20px)';
+                    card.style.transitionDelay = `${index * 0.1}s`;
+                    cardObserver.observe(card);
+                });
+            }
+            
+            // --- Header scroll effect ---
+            const header = document.querySelector('.page-header');
+            if (header) {
+                window.addEventListener('scroll', () => {
+                    if (window.scrollY > 10) {
+                        header.classList.add('header-scrolled');
+                    } else {
+                        header.classList.remove('header-scrolled');
                     }
                 });
-            });
-
-             // --- Function to Add odd/even classes dynamically ---
-             function applyOddEvenClasses() {
-                 let isOdd = true;
-                 // Only apply to visible data rows
-                 const visibleRows = Array.from(tableBody.querySelectorAll('tr')).filter(row => !row.querySelector('td.category') && row.style.display !== 'none');
-                 visibleRows.forEach(row => {
-                    row.classList.remove('odd-row', 'even-row'); // Clear existing
-                    row.classList.add(isOdd ? 'odd-row' : 'even-row');
-                    // Add data-capability attribute if not already present
-                    if (!row.hasAttribute('data-capability-row')) {
-                        const capabilityText = row.querySelector('td:first-child')?.textContent.trim();
-                        if(capabilityText) {
-                            row.setAttribute('data-capability-row', capabilityText);
-                        }
-                    }
-                    isOdd = !isOdd;
-                 });
-             }
-
-             // Initial application of odd/even classes and capability attributes
-             applyOddEvenClasses();
-             
-             // Add smooth transition class to all rows
-             dataRows.forEach(row => {
-                row.classList.add('smooth-transition');
-             });
-             
-             // Apply subtle animations to cards on scroll
-             const cards = document.querySelectorAll('.model-card');
-             const observerOptions = {
-                 threshold: 0.1,
-                 rootMargin: '0px 0px -50px 0px'
-             };
-             
-             const cardObserver = new IntersectionObserver((entries) => {
-                 entries.forEach(entry => {
-                     if (entry.isIntersecting) {
-                         entry.target.style.opacity = '1';
-                         entry.target.style.transform = 'translateY(0)';
-                         cardObserver.unobserve(entry.target);
-                     }
-                 });
-             }, observerOptions);
-             
-             cards.forEach((card, index) => {
-                 card.style.opacity = '0';
-                 card.style.transform = 'translateY(20px)';
-                 card.style.transitionDelay = `${index * 0.1}s`;
-                 cardObserver.observe(card);
-             });
-             
-             // Fancy header effect on scroll
-             const header = document.querySelector('.page-header');
-             window.addEventListener('scroll', () => {
-                 if (window.scrollY > 10) {
-                     header.classList.add('header-scrolled');
-                 } else {
-                     header.classList.remove('header-scrolled');
-                 }
-             });
+            }
         });
     </script>
 </body>
