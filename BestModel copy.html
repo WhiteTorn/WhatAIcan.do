@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="An up-to-date comparison dashboard of the core capabilities of leading AI tools like ChatGPT, Claude, Grok, Gemini, and Perplexity.">
+    <title>AI Capabilities Dashboard | Compare Top AI Tools</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Define custom base styles, animations, and AI colors - LIGHT THEME */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .fade-in-load {
+            animation: fadeIn 0.7s ease-out forwards;
+        }
+
+        /* --- AI Theme Colors (Light Backgrounds, Dark Text) --- */
+        /* Using lighter bg, darker text/borders for better contrast */
+        .ai-header.chatgpt { background-color: #a7f3d0; color: #047857; border-color: #069668; } /* Light Emerald */
+        .ai-header.claude { background-color: #fed7aa; color: #9a3412; border-color: #c2410c; } /* Light Orange */
+        .ai-header.grok { background-color: #e9d5ff; color: #7e22ce; border-color: #9333ea; } /* Light Violet */
+        .ai-header.gemini { background-color: #bfdbfe; color: #1e40af; border-color: #2563eb; } /* Light Blue */
+        .ai-header.perplexity { background-color: #a7f3d0; color: #065f46; border-color: #059669; } /* Light Green (Shared with ChatGPT for variety) */
+
+        /* --- Indicator Styles --- */
+        .indicator {
+            font-size: 1.2rem; /* Slightly larger for emojis */
+            line-height: 1;
+            display: inline-block;
+            /* Removed fixed width/height for emoji flexibility */
+        }
+        .indicator-best {
+            font-size: 1.3rem; /* Star emoji size */
+            line-height: 1;
+            display: inline-block;
+        }
+        /* Highlight for the 'Best' cell */
+        .best-cell {
+             /* Subtle highlight using the AI's theme color */
+            /* Applied dynamically via JS or could be hardcoded if preferred */
+        }
+        .best-cell.chatgpt-best { background-color: rgba(167, 243, 208, 0.4); }
+        .best-cell.claude-best { background-color: rgba(254, 215, 170, 0.4); }
+        .best-cell.grok-best { background-color: rgba(233, 213, 255, 0.4); }
+        .best-cell.gemini-best { background-color: rgba(191, 219, 254, 0.4); }
+        .best-cell.perplexity-best { background-color: rgba(167, 243, 208, 0.4); } /* Using same as chatgpt */
+
+
+        /* Table styles - LIGHT THEME */
+        .light-table {
+            border-spacing: 0;
+            background-color: #ffffff; /* White table background */
+            color: #1f2937; /* Dark Gray text */
+        }
+        .light-table th {
+            border-bottom-width: 2px;
+            border-color: #e5e7eb; /* Light gray border */
+            padding-top: 0.8rem;
+            padding-bottom: 0.8rem;
+            font-size: 0.9rem;
+            font-weight: 600; /* Slightly bolder headers */
+        }
+        .light-table td {
+            vertical-align: middle;
+            padding: 0.75rem 1rem; /* Adjusted padding */
+            font-size: 0.9rem;
+            border-bottom: 1px solid #f3f4f6; /* Very light row separator */
+        }
+        /* Category header styling */
+        .category-header {
+            background-color: #f3f4f6; /* Light gray background */
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #4b5563; /* Medium gray text */
+        }
+        /* Sticky header/column backgrounds - LIGHT THEME */
+        .sticky-header-light {
+            position: sticky;
+            top: 0;
+            z-index: 20;
+            background-color: #f9fafb; /* Slightly off-white sticky header */
+            border-color: #e5e7eb;
+        }
+        .sticky-col-light {
+            position: sticky;
+            left: 0;
+            z-index: 10;
+            background-color: #ffffff; /* White sticky column */
+            border-right: 1px solid #f3f4f6; /* Separator for sticky col */
+        }
+        /* Alternating row colors for readability */
+        tr.even-row .sticky-col-light { background-color: #f9fafb; }
+        tr.odd-row .sticky-col-light { background-color: #ffffff; }
+
+        .sticky-col-light.category { background-color: #f3f4f6; } /* Match category header */
+
+        /* Hover effect */
+        tbody tr:hover {
+            background-color: #f0f9ff; /* Light blue hover */
+        }
+        tbody tr:hover .sticky-col-light {
+             background-color: #f0f9ff; /* Match hover */
+        }
+         tbody tr:hover .sticky-col-light.category {
+             background-color: #e0f2fe; /* Slightly darker hover for category */
+        }
+
+        /* Highlight class for JS filtering */
+        tr.highlighted {
+            background-color: #fef9c3; /* Light yellow highlight */
+        }
+         tr.highlighted .sticky-col-light {
+             background-color: #fef9c3; /* Match highlight */
+        }
+
+        /* Use Case Button Styling */
+        .use-case-button {
+            background-color: #e5e7eb;
+            color: #374151;
+            border: 1px solid #d1d5db;
+            padding: 5px 12px;
+            border-radius: 9999px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+        }
+        .use-case-button:hover {
+            background-color: #d1d5db;
+            border-color: #9ca3af;
+        }
+        .use-case-button.active {
+            background-color: #bfdbfe; /* Light blue active */
+            color: #1e40af;
+            border-color: #93c5fd;
+        }
+
+        /* Legend Interaction Highlight */
+        .legend-highlight {
+            outline: 2px dashed #fbbf24; /* Amber outline */
+            outline-offset: 2px;
+            transition: outline 0.2s ease-in-out;
+        }
+
+    </style>
+</head>
+<body class="bg-gradient-to-br from-sky-50 via-slate-50 to-gray-100 text-gray-800 font-sans antialiased">
+
+    <!-- Remove embedded SVG Icons if using emojis -->
+    <!--
+    <svg width="0" height="0" style="position:absolute">
+      <defs>
+        <symbol id="icon-check" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="20 6 9 17 4 12"></polyline>
+        </symbol>
+        <symbol id="icon-x" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </symbol>
+      </defs>
+    </svg>
+    -->
+
+    <div class="container mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
+
+        <div class="main-container bg-white/80 backdrop-blur-lg rounded-xl shadow-lg p-5 sm:p-8 border border-gray-200/80 fade-in-load">
+
+            <h1 class="text-2xl sm:text-4xl font-bold text-center text-transparent bg-clip-text bg-gradient-to-r from-sky-600 via-teal-600 to-blue-600 mb-3 tracking-tight">
+                AI Capabilities Dashboard
+            </h1>
+            <p class="text-center text-sm sm:text-base text-slate-600 mb-6 max-w-2xl mx-auto">
+                Compare top AI models at a glance — find the best fit for your needs. Updated regularly.
+            </p>
+
+            <!-- Legend -->
+            <div class="text-center text-gray-600 mb-6 text-xs sm:text-sm flex flex-wrap justify-center items-center gap-x-5 gap-y-3" id="legend">
+                 <span class="inline-flex items-center gap-2 legend-item" data-type="best">
+                    <span class="indicator-best">⭐</span> Top performer
+                 </span>
+                 <span class="inline-flex items-center gap-2 legend-item" data-type="yes">
+                    <span class="indicator">✅</span> Supported
+                 </span>
+                  <span class="inline-flex items-center gap-2 legend-item" data-type="no">
+                    <span class="indicator">❌</span> Limited/None
+                 </span>
+            </div>
+
+             <!-- Use Case Filter Buttons -->
+            <div class="text-center mb-6 flex flex-wrap justify-center gap-2" id="use-case-filters">
+                <button class="use-case-button" data-capability="Everyday answers">General Use</button>
+                <button class="use-case-button" data-capability="Writing">Writing</button>
+                <button class="use-case-button" data-capability="Coding">Coding</button>
+                <button class="use-case-button" data-capability="Web search">Research</button>
+                <button class="use-case-button" data-capability="Image gen">Image Gen</button>
+                <button class="use-case-button active" data-capability="all">Show All</button> <!-- Default active -->
+            </div>
+
+
+            <!-- Responsive Table Wrapper -->
+            <div class="overflow-x-auto rounded-lg border border-gray-200/80 shadow-md">
+                <table class="light-table w-full min-w-[800px] border-collapse" id="capabilities-table">
+                    <thead>
+                        <tr class="bg-gray-100">
+                            <th class="sticky-header-light p-4 font-semibold text-left text-slate-700 border-b border-gray-300 sticky left-0 z-20 bg-gray-100">Capability</th>
+                            <th class="sticky-header-light ai-header chatgpt p-4 font-semibold text-center border-b">ChatGPT</th>
+                            <th class="sticky-header-light ai-header claude p-4 font-semibold text-center border-b">Claude</th>
+                            <th class="sticky-header-light ai-header grok p-4 font-semibold text-center border-b">Grok</th>
+                            <th class="sticky-header-light ai-header gemini p-4 font-semibold text-center border-b">Gemini</th>
+                            <th class="sticky-header-light ai-header perplexity p-4 font-semibold text-center border-b">Perplexity</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-100">
+                        <!-- CATEGORY: General -->
+                        <tr>
+                            <td colspan="6" class="sticky-col-light category p-2 font-semibold text-left">GENERAL</td>
+                        </tr>
+                        <tr class="odd-row hover:bg-slate-100 transition-colors duration-150 ease-in-out">
+                            <td class="sticky-col-light p-3 font-medium text-slate-700" title="General knowledge, simple questions, quick tasks.">Everyday answers</td>
+                            <td class="p-3 text-center best-cell chatgpt-best"><span class="indicator-best" data-indicator="best">⭐</span></td>
+                            <td class="p-3 text-center"><span class="indicator" data-indicator="yes">✅</span></td>
+                            <td class="p-3 text-center"><span class="indicator" data-indicator="yes">✅</span></td>
+                            <td class="p-3 text-center"><span class="indicator" data-indicator="yes">✅</span></td>
+                            <td class="p-3 text-center"><span class="indicator" data-indicator="yes">✅</span></td>
+                        </tr>
+                         <tr class="even-row hover:bg-slate-100 transition-colors duration-150 ease-in-out">
+                            <td class="sticky-col-light p-3 font-medium text-slate-700" title="Availability of free access tiers vs paid subscriptions.">Pricing</td>
+                            <td class="p-3 text-center text-xs">Free & Paid</td>
+                            <td class="p-3 text-center text-xs">Free & Paid</td>
+                            <td class="p-3 text-center text-xs">Paid (X Premium)</td>
+                            <td class="p-3 text-center text-xs">Free & Paid</td>
+                            <td class="p-3 text-center text-xs">Free & Paid</td>
+                        </tr>
+
+                        <!-- CATEGORY: Text & Knowledge -->
+                        <tr>
+                            <td colspan="6" class="sticky-col-light category p-2 font-semibold text-left">TEXT & KNOWLEDGE</td>
+                        </tr>
+                        <tr class="odd-row hover:bg-slate-100 transition-colors duration-150 ease-in-out">
+                            <td class="sticky-col-light p-3 font-medium text-slate-700" title="Drafting emails, articles, creative content, summarization.">Writing</td>
+                             <td class="p-3 text-center"><span class="indicator" data-indicator="yes">✅</span></td>
+                             <td class="p-3 text-center best-cell claude-best"><span class="indicator-best" data-indicator="best">⭐</span></td>
+                             <td class="p-3 text-center"><span class="indicator" data-indicator="yes">✅</span></td>
+                             <td class="p-3 text-center"><span class="indicator" data-indicator="yes">✅</span></td>
+                             <td class="p-3 text-center"><span class="indicator" data-indicator="yes">✅</span></td>
+                        </tr>
+                        <tr class="even-row hover:bg-slate-100 transition-colors duration-150 ease-in-out">
+                            <td class="sticky-col-light p-3 font-medium text-slate-700" title="Logical deduction, problem-solving, complex instructions.">Reasoning</td>
+                            <td class="p-3 text-center best-cell chatgpt-best"><span class="indicator-best" data-indicator="best">⭐</span></td>
+                            <td class="p-3 text-center"><span class="indicator" data-indicator="yes">✅</span></td>
+                            <td class="p-3 text-center"><span class="indicator" data-indicator="yes">✅</span></td>
+                            <td class="p-3 text-center"><span class="indicator" data-indicator="yes">✅</span></td>
+                            <td class="p-3 text-center"><span class="indicator" data-indicator="yes">✅</span></td>
+                        </tr>
+
+                        <!-- CATEGORY: Technical -->
+                        <tr>
+                            <td colspan="6" class="sticky-col-light category p-2 font-semibold text-left">TECHNICAL</td>
+                        </tr>
+                        <tr class="odd-row hover:bg-slate-100 transition-colors duration-150 ease-in-out">
+                            <td class="sticky-col-light p-3 font-medium text-slate-700" title="Generating, explaining, and debugging code across languages.">Coding</td>
+                            <td class="p-3 text-center"><span class="indicator" data-indicator="yes">✅</span></td>
+                            <td class="p-3 text-center"><span class="indicator" data-indicator="yes">✅</span></td>
+                            <td class="p-3 text-center"><span class="indicator" data-indicator="yes">✅</span></td>
+                            <td class="p-3 text-center best-cell gemini-best"><span class="indicator-best" data-indicator="best">⭐</span></td>
+                            <td class="p-3 text-center"><span class="indicator" data-indicator="yes">✅</span></td>
+                        </tr>
+                        <tr class="even-row hover:bg-slate-100 transition-colors duration-150 ease-in-out">
+                            <td class="sticky-col-light p-3 font-medium text-slate-700" title="Solving mathematical problems, understanding formulas.">Math</td>
+                             <td class="p-3 text-center best-cell chatgpt-best"><span class="indicator-best" data-indicator="best">⭐</span></td>
+                             <td class="p-3 text-center"><span class="indicator" data-indicator="yes">✅</span></td>
+                             <td class="p-3 text-center"><span class="indicator" data-indicator="yes">✅</span></td>
+                             <td class="p-3 text-center"><span class="indicator" data-indicator="yes">✅</span></td>
+                             <td class="p-3 text-center"><span class="indicator" data-indicator="yes">✅</span></td>
+                        </tr>
+
+                        <!-- CATEGORY: Research -->
+                        <tr>
+                            <td colspan="6" class="sticky-col-light category p-2 font-semibold text-left">RESEARCH</td>
+                        </tr>
+                        <tr class="odd-row hover:bg-slate-100 transition-colors duration-150 ease-in-out">
+                            <td class="sticky-col-light p-3 font-medium text-slate-700" title="Accessing and summarizing current information from the web.">Web search</td>
+                             <td class="p-3 text-center"><span class="indicator" data-indicator="yes">✅</span></td>
+                             <td class="p-3 text-center"><span class="indicator" data-indicator="yes">✅</span></td>
+                             <td class="p-3 text-center"><span class="indicator" data-indicator="yes">✅</span></td>
+                             <td class="p-3 text-center"><span class="indicator" data-indicator="yes">✅</span></td>
+                             <td class="p-3 text-center best-cell perplexity-best"><span class="indicator-best" data-indicator="best">⭐</span></td>
+                        </tr>
+                        <tr class="even-row hover:bg-slate-100 transition-colors duration-150 ease-in-out">
+                            <td class="sticky-col-light p-3 font-medium text-slate-700" title="In-depth analysis, synthesizing information from multiple sources.">Deep research</td>
+                            <td class="p-3 text-center best-cell chatgpt-best"><span class="indicator-best" data-indicator="best">⭐</span></td>
+                            <td class="p-3 text-center"><span class="indicator" data-indicator="no">❌</span></td>
+                            <td class="p-3 text-center"><span class="indicator" data-indicator="yes">✅</span></td>
+                            <td class="p-3 text-center"><span class="indicator" data-indicator="yes">✅</span></td>
+                            <td class="p-3 text-center"><span class="indicator" data-indicator="yes">✅</span></td>
+                        </tr>
+
+                        <!-- CATEGORY: Multimodal -->
+                        <tr>
+                            <td colspan="6" class="sticky-col-light category p-2 font-semibold text-left">MULTIMODAL</td>
+                        </tr>
+                        <tr class="odd-row hover:bg-slate-100 transition-colors duration-150 ease-in-out">
+                            <td class="sticky-col-light p-3 font-medium text-slate-700" title="Engaging in spoken conversations with the AI.">Voice chat</td>
+                             <td class="p-3 text-center best-cell chatgpt-best"><span class="indicator-best" data-indicator="best">⭐</span></td>
+                             <td class="p-3 text-center"><span class="indicator" data-indicator="no">❌</span></td>
+                             <td class="p-3 text-center"><span class="indicator" data-indicator="yes">✅</span></td>
+                             <td class="p-3 text-center"><span class="indicator" data-indicator="yes">✅</span></td>
+                             <td class="p-3 text-center"><span class="indicator" data-indicator="yes">✅</span></td>
+                        </tr>
+                        <tr class="even-row hover:bg-slate-100 transition-colors duration-150 ease-in-out">
+                            <td class="sticky-col-light p-3 font-medium text-slate-700" title="Creating images from text descriptions (text-to-image).">Image gen</td>
+                            <td class="p-3 text-center best-cell chatgpt-best"><span class="indicator-best" data-indicator="best">⭐</span></td>
+                            <td class="p-3 text-center"><span class="indicator" data-indicator="no">❌</span></td>
+                            <td class="p-3 text-center"><span class="indicator" data-indicator="yes">✅</span></td>
+                            <td class="p-3 text-center"><span class="indicator" data-indicator="yes">✅</span></td>
+                            <td class="p-3 text-center"><span class="indicator" data-indicator="no">❌</span></td>
+                        </tr>
+                        <tr class="odd-row hover:bg-slate-100 transition-colors duration-150 ease-in-out">
+                            <td class="sticky-col-light p-3 font-medium text-slate-700" title="Creating short video clips (often experimental/limited).">Video gen</td>
+                             <td class="p-3 text-center"><span class="indicator" data-indicator="yes">✅</span></td>
+                             <td class="p-3 text-center"><span class="indicator" data-indicator="no">❌</span></td>
+                             <td class="p-3 text-center"><span class="indicator" data-indicator="no">❌</span></td>
+                             <td class="p-3 text-center best-cell gemini-best"><span class="indicator-best" data-indicator="best">⭐</span></td>
+                             <td class="p-3 text-center"><span class="indicator" data-indicator="no">❌</span></td>
+                        </tr>
+
+                        <!-- CATEGORY: Advanced Interaction -->
+                        <tr>
+                            <td colspan="6" class="sticky-col-light category p-2 font-semibold text-left">ADVANCED INTERACTION</td>
+                        </tr>
+                        <tr class="odd-row hover:bg-slate-100 transition-colors duration-150 ease-in-out">
+                            <td class="sticky-col-light p-3 font-medium text-slate-700" title="Using the device's camera for real-time input and analysis.">Live camera</td>
+                            <td class="p-3 text-center best-cell chatgpt-best"><span class="indicator-best" data-indicator="best">⭐</span></td>
+                            <td class="p-3 text-center"><span class="indicator" data-indicator="no">❌</span></td>
+                            <td class="p-3 text-center"><span class="indicator" data-indicator="no">❌</span></td>
+                            <td class="p-3 text-center"><span class="indicator" data-indicator="yes">✅</span></td>
+                            <td class="p-3 text-center"><span class="indicator" data-indicator="no">❌</span></td>
+                        </tr>
+                        <tr class="even-row hover:bg-slate-100 transition-colors duration-150 ease-in-out">
+                            <td class="sticky-col-light p-3 font-medium text-slate-700" title="Ability to interact with and control desktop applications (emerging feature).">Computer use</td>
+                             <td class="p-3 text-center best-cell chatgpt-best"><span class="indicator-best" data-indicator="best">⭐</span></td>
+                             <td class="p-3 text-center"><span class="indicator" data-indicator="yes">✅</span></td>
+                             <td class="p-3 text-center"><span class="indicator" data-indicator="no">❌</span></td>
+                             <td class="p-3 text-center"><span class="indicator" data-indicator="no">❌</span></td>
+                             <td class="p-3 text-center"><span class="indicator" data-indicator="no">❌</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Quick Summary Section -->
+            <div class="mt-8 mb-2 text-sm text-slate-700 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+                <div class="p-3 rounded-lg bg-emerald-50 border border-emerald-200">
+                    <h3 class="text-emerald-700 font-semibold mb-1">ChatGPT</h3>
+                    <p class="text-xs text-emerald-600">Strong all-rounder, excels in reasoning, interaction, and image generation.</p>
+                </div>
+                <div class="p-3 rounded-lg bg-orange-50 border border-orange-200">
+                    <h3 class="text-orange-700 font-semibold mb-1">Claude</h3>
+                    <p class="text-xs text-orange-600">Top-tier writing quality and analysis of long documents.</p>
+                </div>
+                <div class="p-3 rounded-lg bg-violet-50 border border-violet-200">
+                    <h3 class="text-violet-700 font-semibold mb-1">Grok</h3>
+                    <p class="text-xs text-violet-600">Integrates real-time info (X), good conversational ability.</p>
+                </div>
+                <div class="p-3 rounded-lg bg-blue-50 border border-blue-200">
+                    <h3 class="text-blue-700 font-semibold mb-1">Gemini</h3>
+                    <p class="text-xs text-blue-600">Excellent coding capabilities and strong multimodal features (video).</p>
+                </div>
+                 <div class="p-3 rounded-lg bg-teal-50 border border-teal-200">
+                    <h3 class="text-teal-700 font-semibold mb-1">Perplexity</h3>
+                    <p class="text-xs text-teal-600">Best-in-class for web search integration and research tasks.</p>
+                </div>
+            </div>
+
+            <div class="text-center text-xs text-slate-500 mt-6">
+                <p>Last Updated: <span id="update-date" class="font-medium text-slate-600">May 2024</span></p>
+                <p class="mt-1">Source: Based on general consensus & public feature announcements. | Found an error? <a href="mailto:your-email@example.com?subject=AI Dashboard Error" class="text-sky-600 hover:text-sky-500">Let us know!</a></p> <!-- Replace with your email or link -->
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set the update date dynamically
+            const now = new Date();
+            const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+            document.getElementById('update-date').textContent = months[now.getMonth()] + ' ' + now.getFullYear();
+
+            const table = document.getElementById('capabilities-table');
+            const tableBody = table.querySelector('tbody');
+            const rows = tableBody.querySelectorAll('tr:not(:has(td.category))'); // Get only data rows
+            const filterButtonsContainer = document.getElementById('use-case-filters');
+            const filterButtons = filterButtonsContainer.querySelectorAll('.use-case-button');
+            const legendItems = document.querySelectorAll('#legend .legend-item');
+
+            // --- Use Case Filtering ---
+            filterButtonsContainer.addEventListener('click', function(event) {
+                if (event.target.classList.contains('use-case-button')) {
+                    const button = event.target;
+                    const capabilityFilter = button.getAttribute('data-capability');
+
+                    // Update active button state
+                    filterButtons.forEach(btn => btn.classList.remove('active'));
+                    button.classList.add('active');
+
+                    // Filter rows
+                    rows.forEach(row => {
+                        const capabilityCell = row.querySelector('td:first-child');
+                        // Check if the capability cell exists and get its text content
+                        const capabilityText = capabilityCell ? capabilityCell.textContent.trim() : '';
+
+                        if (capabilityFilter === 'all' || capabilityText === capabilityFilter) {
+                            row.classList.remove('hidden'); // Show row
+                            row.classList.remove('highlighted'); // Remove previous highlight
+                            if (capabilityFilter !== 'all') {
+                                row.classList.add('highlighted'); // Highlight matching row
+                            }
+                        } else {
+                            row.classList.add('hidden'); // Hide row
+                            row.classList.remove('highlighted'); // Remove highlight if hidden
+                        }
+                    });
+                }
+            });
+
+            // --- Interactive Legend ---
+            legendItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    const type = item.getAttribute('data-type');
+                    const indicators = tableBody.querySelectorAll(`[data-indicator="${type}"]`);
+
+                    // Toggle highlight class on indicators
+                    const isHighlighting = !item.classList.contains('legend-active'); // Check if we are activating
+
+                    // Remove active state and highlights from all legend items and indicators first
+                    legendItems.forEach(i => i.classList.remove('legend-active'));
+                    tableBody.querySelectorAll('.legend-highlight').forEach(el => el.classList.remove('legend-highlight'));
+
+                    if (isHighlighting) {
+                        item.classList.add('legend-active'); // Mark legend item as active
+                        indicators.forEach(indicator => {
+                            // Highlight the parent cell (td)
+                            indicator.closest('td').classList.add('legend-highlight');
+                        });
+                    }
+                    // If !isHighlighting, we just removed highlights, so do nothing more.
+                });
+            });
+
+             // --- Add odd/even classes dynamically for styling sticky cols ---
+             // Also add data-capability attribute to rows for easier filtering
+             let isOdd = true;
+             tableBody.querySelectorAll('tr').forEach(row => {
+                if (row.querySelector('td.category')) {
+                    // Reset for new category if needed, or just skip
+                    return;
+                }
+                row.classList.add(isOdd ? 'odd-row' : 'even-row');
+                const capabilityText = row.querySelector('td:first-child')?.textContent.trim();
+                if(capabilityText) {
+                    row.setAttribute('data-capability-row', capabilityText);
+                }
+                isOdd = !isOdd;
+             });
+
+        });
+    </script>
+</body>
+</html>

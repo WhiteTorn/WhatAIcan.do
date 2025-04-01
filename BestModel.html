@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="An up-to-date comparison dashboard of the core capabilities of leading AI tools like ChatGPT, Claude, Grok, Gemini, and Perplexity.">
+    <title>AI Capabilities Dashboard | Compare Top AI Tools</title>
+    <!-- Include Tailwind CSS via CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Define custom base styles, animations, and AI colors */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .fade-in-load {
+            animation: fadeIn 0.7s ease-out forwards;
+        }
+        
+        /* New animation for hover effects */
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        .hover-pulse:hover {
+            animation: pulse 0.5s ease-in-out;
+        }
+
+        /* --- AI Theme Colors (Bright Version) --- */
+        .ai-header.chatgpt { background-color: #10a37f; color: #ffffff; border-color: #0d8f70; } /* Bright teal */
+        .ai-header.claude { background-color: #FF9500; color: #ffffff; border-color: #e68600; } /* Bright orange */
+        .ai-header.grok { background-color: #8B5CF6; color: #ffffff; border-color: #7c4ef3; } /* Bright purple */
+        .ai-header.gemini { background-color: #3B82F6; color: #ffffff; border-color: #2563eb; } /* Bright blue */
+        .ai-header.perplexity { background-color: #10B981; color: #ffffff; border-color: #0ea271; } /* Bright green */
+
+        /* --- Indicator Styles --- */
+        .indicator {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            transition: transform 0.2s ease;
+        }
+        .indicator:hover {
+            transform: scale(1.2);
+        }
+        .indicator svg {
+            width: 14px;
+            height: 14px;
+        }
+        .indicator-yes {
+            background-color: rgba(22, 163, 74, 0.15);
+        }
+        .indicator-yes svg {
+            stroke: #16a34a; /* Darker green for better contrast */
+        }
+        .indicator-no {
+            background-color: rgba(220, 38, 38, 0.1);
+        }
+        .indicator-no svg {
+            stroke: #dc2626; /* Darker red for better contrast */
+        }
+        
+        /* Best indicator with star icon */
+        .best-cell {
+            position: relative;
+            transition: transform 0.2s ease;
+        }
+        .best-cell:hover {
+            transform: scale(1.05);
+        }
+        .best-cell::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: -1;
+            border-radius: 0.25rem;
+            opacity: 0.2;
+        }
+        .indicator-star {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .indicator-star svg {
+            width: 18px;
+            height: 18px;
+            fill: currentColor;
+            stroke: currentColor;
+        }
+        
+        /* Cell background colors for best indicators (Light theme) */
+        .best-cell.chatgpt::before { background-color: #10a37f; }
+        .best-cell.claude::before { background-color: #FF9500; }
+        .best-cell.grok::before { background-color: #8B5CF6; }
+        .best-cell.gemini::before { background-color: #3B82F6; }
+        .best-cell.perplexity::before { background-color: #10B981; }
+        
+        /* Star colors (Light theme) */
+        .star-chatgpt { color: #059669; }
+        .star-claude { color: #d97706; }
+        .star-grok { color: #7c3aed; }
+        .star-gemini { color: #2563eb; }
+        .star-perplexity { color: #059669; }
+
+        /* Updated table styles for light theme */
+        .light-table {
+            border-spacing: 0;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        .light-table th {
+            border-bottom-width: 2px;
+            padding-top: 0.8rem; 
+            padding-bottom: 0.8rem;
+            font-size: 0.9rem;
+        }
+        .light-table td {
+            vertical-align: middle;
+            padding: 0.65rem 1rem;
+            font-size: 0.9rem;
+            border: 1px solid #e5e7eb;
+        }
+        
+        /* Category header styling - color coded by category */
+        .category-text { 
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #4b5563;
+        }
+        .category-knowledge { background-color: #dbeafe; } /* Light blue */
+        .category-technical { background-color: #e0e7ff; } /* Light indigo */
+        .category-research { background-color: #dcfce7; } /* Light green */
+        .category-multimodal { background-color: #fef3c7; } /* Light amber */
+        .category-advanced { background-color: #fae8ff; } /* Light purple */
+        
+        /* Ensure sticky header/column backgrounds are opaque */
+        .sticky-header-light {
+            position: sticky; 
+            top: 0; 
+            z-index: 20;
+            background-color: #ffffff;
+        }
+        .sticky-col-light {
+            position: sticky; 
+            left: 0; 
+            z-index: 10;
+            background-color: #ffffff;
+        }
+        
+        /* Filter buttons */
+        .filter-button {
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            background-color: #f3f4f6;
+            color: #4b5563;
+            border: 1px solid #e5e7eb;
+        }
+        .filter-button:hover {
+            background-color: #e5e7eb;
+        }
+        .filter-button.active {
+            background-color: #3b82f6;
+            color: white;
+            border-color: #2563eb;
+        }
+        
+        /* Tooltip styling */
+        .tooltip-container {
+            position: relative;
+            display: inline-block;
+        }
+        .tooltip-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background-color: #e5e7eb;
+            color: #6b7280;
+            font-size: 10px;
+            font-weight: bold;
+            cursor: help;
+            margin-left: 4px;
+        }
+        .tooltip-text {
+            visibility: hidden;
+            width: 200px;
+            background-color: #374151;
+            color: #f9fafb;
+            text-align: center;
+            border-radius: 6px;
+            padding: 8px;
+            position: absolute;
+            z-index: 30;
+            bottom: 125%;
+            left: 50%;
+            transform: translateX(-50%);
+            opacity: 0;
+            transition: opacity 0.3s;
+            font-size: 0.75rem;
+            line-height: 1.25rem;
+            font-weight: normal;
+            text-transform: none;
+            letter-spacing: normal;
+        }
+        .tooltip-container:hover .tooltip-text {
+            visibility: visible;
+            opacity: 1;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-blue-50 via-white to-purple-50 text-gray-800 font-sans antialiased">
+
+    <!-- Embedded SVG Icons -->
+    <svg width="0" height="0" style="position:absolute">
+      <defs>
+        <symbol id="icon-check" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="20 6 9 17 4 12"></polyline>
+        </symbol>
+        <symbol id="icon-x" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </symbol>
+        <symbol id="icon-star" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+        </symbol>
+        <symbol id="icon-filter" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+        </symbol>
+      </defs>
+    </svg>
+
+    <div class="container mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
+
+        <div class="main-container bg-white rounded-xl shadow-lg p-5 sm:p-8 border border-gray-200 fade-in-load">
+
+            <h1 class="text-2xl sm:text-4xl font-bold text-center text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-purple-500 to-cyan-500 mb-3 tracking-tight">
+                AI Capabilities Dashboard
+            </h1>
+            <p class="text-center text-sm sm:text-base text-gray-600 mb-4 max-w-2xl mx-auto">
+                Compare top AI models at a glance — updated regularly
+            </p>
+
+            <!-- Category Filter Buttons -->
+            <div class="mb-6 flex flex-wrap justify-center gap-2">
+                <button class="filter-button active" data-category="all">All Categories</button>
+                <button class="filter-button" data-category="knowledge">Text & Knowledge</button>
+                <button class="filter-button" data-category="technical">Technical</button>
+                <button class="filter-button" data-category="research">Research</button>
+                <button class="filter-button" data-category="multimodal">Multimodal</button>
+                <button class="filter-button" data-category="advanced">Advanced</button>
+            </div>
+
+            <!-- Legend -->
+            <div class="text-center text-gray-600 mb-6 text-xs sm:text-sm flex flex-wrap justify-center items-center gap-x-5 gap-y-3">
+                 <span class="inline-flex items-center gap-2">
+                    <span class="indicator-star star-chatgpt"><svg><use href="#icon-star" /></svg></span> Top performer
+                 </span>
+                 <span class="inline-flex items-center gap-2">
+                    <span class="indicator indicator-yes"><svg><use href="#icon-check" /></svg></span> Supported
+                 </span>
+                  <span class="inline-flex items-center gap-2">
+                    <span class="indicator indicator-no"><svg><use href="#icon-x" /></svg></span> Limited/None
+                 </span>
+            </div>
+
+            <!-- Responsive Table Wrapper -->
+            <div class="overflow-x-auto rounded-lg border border-gray-200 shadow">
+                <table class="light-table w-full min-w-[800px] border-collapse">
+                    <thead>
+                        <tr class="bg-gray-100">
+                            <th class="p-4 font-semibold text-left text-gray-700 border-b border-gray-200 sticky-header-light">Capability</th>
+                            <th class="ai-header chatgpt p-4 font-semibold text-center border-b sticky-header-light">ChatGPT</th>
+                            <th class="ai-header claude p-4 font-semibold text-center border-b sticky-header-light">Claude</th>
+                            <th class="ai-header grok p-4 font-semibold text-center border-b sticky-header-light">Grok</th>
+                            <th class="ai-header gemini p-4 font-semibold text-center border-b sticky-header-light">Gemini</th>
+                            <th class="ai-header perplexity p-4 font-semibold text-center border-b sticky-header-light">Perplexity</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- CATEGORY: Text & Knowledge -->
+                        <tr class="category-row" data-category="knowledge">
+                            <td colspan="6" class="sticky-col-light category-knowledge p-2 font-semibold text-left category-text">
+                                TEXT & KNOWLEDGE
+                            </td>
+                        </tr>
+                        <tr class="hover:bg-blue-50 transition-colors duration-150 ease-in-out data-row" data-category="knowledge">
+                            <td class="sticky-col-light p-3 font-medium text-gray-700">
+                                💬 Everyday answers
+                                <span class="tooltip-container">
+                                    <span class="tooltip-icon">?</span>
+                                    <span class="tooltip-text">General information and conversational responses for day-to-day queries</span>
+                                </span>
+                            </td>
+                            <td class="p-3 text-center best-cell chatgpt"><span class="indicator-star star-chatgpt"><svg><use href="#icon-star" /></svg></span></td>
+                            <td class="p-3 text-center"><span class="indicator indicator-yes"><svg><use href="#icon-check" /></svg></span></td>
+                            <td class="p-3 text-center"><span class="indicator indicator-yes"><svg><use href="#icon-check" /></svg></span></td>
+                            <td class="p-3 text-center"><span class="indicator indicator-yes"><svg><use href="#icon-check" /></svg></span></td>
+                            <td class="p-3 text-center"><span class="indicator indicator-yes"><svg><use href="#icon-check" /></svg></span></td>
+                        </tr>
+                        <tr class="hover:bg-blue-50 transition-colors duration-150 ease-in-out data-row" data-category="knowledge">
+                            <td class="sticky-col-light p-3 font-medium text-gray-700">
+                                ✍️ Writing
+                                <span class="tooltip-container">
+                                    <span class="tooltip-icon">?</span>
+                                    <span class="tooltip-text">Creating essays, stories, emails, and other written content with high quality</span>
+                                </span>
+                            </td>
+                             <td class="p-3 text-center"><span class="indicator indicator-yes"><svg><use href="#icon-check" /></svg></span></td>
+                             <td class="p-3 text-center best-cell claude"><span class="indicator-star star-claude"><svg><use href="#icon-star" /></svg></span></td>
+                             <td class="p-3 text-center"><span class="indicator indicator-yes"><svg><use href="#icon-check" /></svg></span></td>
+                             <td class="p-3 text-center"><span class="indicator indicator-yes"><svg><use href="#icon-check" /></svg></span></td>
+                             <td class="p-3 text-center"><span class="indicator indicator-yes"><svg><use href="#icon-check" /></svg></span></td>
+                        </tr>
+                        <tr class="hover:bg-blue-50 transition-colors duration-150 ease-in-out data-row" data-category="knowledge">
+                            <td class="sticky-col-light p-3 font-medium text-gray-700">
+                                🧠 Reasoning
+                                <span class="tooltip-container">
+                                    <span class="tooltip-icon">?</span>
+                                    <span class="tooltip-text">Logical thinking, step-by-step problem solving, and complex analysis</span>
+                                </span>
+                            </td>
+                            <td class="p-3 text-center best-cell chatgpt"><span class="indicator-star star-chatgpt"><svg><use href="#icon-star" /></svg></span></td>
+                            <td class="p-3 text-center"><span class="indicator indicator-yes"><svg><use href="#icon-check" /></svg></span></td>
+                            <td class="p-3 text-center"><span class="indicator indicator-yes"><svg><use href="#icon-check" /></svg></span></td>
+                            <td class="p-3 text-center"><span class="indicator indicator-yes"><svg><use href="#icon-check" /></svg></span></td>
+                            <td class="p-3 text-center"><span class="indicator indicator-yes"><svg><use href="#icon-check" /></svg></span></td>
+                        </tr>
+                        
+                        <!-- CATEGORY: Technical -->
+                        <tr class="category-row" data-category="technical">
+                            <td colspan="6" class="sticky-col-light category-technical p-2 font-semibold text-left category-text">TECHNICAL</td>
+                        </tr>
+                        <tr class="hover:bg-indigo-50 transition-colors duration-150 ease-in-out data-row" data-category="technical">
+                            <td class="sticky-col-light p-3 font-medium text-gray-700">
+                                💻 Coding
+                                <span class="tooltip-container">
+                                    <span class="tooltip-icon">?</span>
+                                    <span class="tooltip-text">Writing, debugging, and explaining code across multiple programming languages</span>
+                                </span>
+                            </td>
+                            <td class="p-3 text-center"><span class="indicator indicator-yes"><svg><use href="#icon-check" /></svg></span></td>
+                            <td class="p-3 text-center"><span class="indicator indicator-yes"><svg><use href="#icon-check" /></svg></span></td>
+                            <td class="p-3 text-center"><span class="indicator indicator-yes"><svg><use href="#icon-check" /></svg></span></td>
+                            <td class="p-3 text-center best-cell gemini"><span class="indicator-star star-gemini"><svg><use href="#icon-star" /></svg></span></td>
+                            <td class="p-3 text-center"><span class="indicator indicator-yes"><svg><use href="#icon-check" /></svg></span></td>
+                        </tr>
+                        <tr class="hover:bg-indigo-50 transition-colors duration-150 ease-in-out data-row" data-category="technical">
+                            <td class="sticky-col-light p-3 font-medium text-gray-700">
+                                🔢 Math
+                                <span class="tooltip-container">
+                                    <span class="tooltip-icon">?</span>
+                                    <span class="tooltip-text">Mathematical calculations, formulas, and solving complex equations</span>
+                                </span>
+                            </td>
+                             <td class="p-3 text-center best-cell chatgpt"><span class="indicator-star star-chatgpt"><svg><use href="#icon-star" /></svg></span></td>
+                             <td class="p-3 text-center"><span class="indicator indicator-yes"><svg><use href="#icon-check" /></svg></span></td>
+                             <td class="p-3 text-center"><span class="indicator indicator-yes"><svg><use href="#icon-check" /></svg></span></td>
+                             <td class="p-3 text-center"><span class="indicator indicator-yes"><svg><use href="#icon-check" /></svg></span></td>
+                             <td class="p-3 text-center"><span class="indicator indicator-yes"><svg><use href="#icon-check" /></svg></span></td>
+                        </tr>
+                        
+                        <!-- CATEGORY: Research -->
+                        <tr class="category-row" data-category="research">
+                            <td colspan="6" class="sticky-col-light category-research p-2 font-semibold text-left category-text">RESEARCH</td>
+                        </tr>
+                        <tr class="hover:bg-green-50 transition-colors duration-150 ease-in-out data-row" data-category="research">
+                            <td class="sticky-col-light p-3 font-medium text-gray-700">
+                                🔍 Web search
+                                <span class="tooltip-container">
+                                    <span class="tooltip-icon">?</span>
+                                    <span class="tooltip-text">Finding and bringing real-time information from the internet</span>
+                                </span>
+                            </td>
+                             <td class="p-3 text-center"><span class="indicator indicator-yes"><svg><use href="#icon-check" /></svg></span></td>
+                             <td class="p-3 text-center"><span class="indicator indicator-yes"><svg><use href="#icon-check" /></svg></span></td>
+                             <td class="p-3 text-center"><span class="indicator indicator-yes"><svg><use href="#icon-check" /></svg></span></td>
+                             <td class="p-3 text-center"><span class="indicator indicator-yes"><svg><use href="#icon-check" /></svg></span></td>
+                             <td class="p-3 text-center best-cell perplexity"><span class="indicator-star star-perplexity"><svg><use href="#icon-star" /></svg></span></td>
+                        </tr>
+                        <tr class="hover:bg-green-50 transition-colors duration-150 ease-in-out data-row" data-category="research">
+                            <td class="sticky-col-light p-3 font-medium text-gray-700">
+                                📚 Deep research
+                                <span class="tooltip-container">
+                                    <span class="tooltip-icon">?</span>
+                                    <span class="tooltip-text">In-depth analysis of topics with thorough and accurate information</span>
+                                </span>
+                            </td>
+                            <td class="p-3 text-center best-cell chatgpt"><span class="indicator-star star-chatgpt"><svg><use href="#icon-star" /></svg></span></td>
+                            <td class="p-3 text-center"><span class="indicator indicator-no"><svg><use href="#icon-x" /></svg></span></td>
+                            <td class="p-3 text-center"><span class="indicator indicator-yes"><svg><use href="#icon-check" /></svg></span></td>
+                            <td class="p-3 text-center"><span class="indicator indicator-yes"><svg><use href="#icon-check" /></svg></span></td>
+                            <td class="p-3 text-center"><span class="indicator indicator-yes"><svg><use href="#icon-check" /></svg></span></td>
+                        </tr>
+                        
+                        <!-- CATEGORY: Multimodal -->
+                        <tr class="category-row" data-category="multimodal">
+                            <td colspan="6" class="sticky-col-light category-multimodal p-2 font-semibold text-left category-text">MULTIMODAL</td>
+                        </tr>
+                        <tr class="hover:bg-amber-50 transition-colors duration-150 ease-in-out data-row" data-category="multimodal">
+                            <td class="sticky-col-light p-3 font-medium text-gray-700">
+                                🎤 Voice chat
+                                <span class="tooltip-container">
+                                    <span class="tooltip-icon">?</span>
+                                    <span class="tooltip-text">Speaking with the AI using voice instead of typing</span>
+                                </span>
+                            </td>
+                             <td class="p-3 text-center best-cell chatgpt"><span class="indicator-star star-chatgpt"><svg><use href="#icon-star" /></svg></span></td>
+                             <td class="p-3 text-center"><span class="indicator indicator-no"><svg><use href="#icon-x" /></svg></span></td>
+                             <td class="p-3 text-center"><span class="indicator indicator-yes"><svg><use href="#icon-check" /></svg></span></td>
+                             <td class="p-3 text-center"><span class="indicator indicator-yes"><svg><use href="#icon-check" /></svg></span></td>
+                             <td class="p-3 text-center"><span class="indicator indicator-yes"><svg><use href="#icon-check" /></svg></span></td>
+                        </tr>
+                        <tr class="hover:bg-amber-50 transition-colors duration-150 ease-in-out data-row" data-category="multimodal">
+                            <td class="sticky-col-light p-3 font-medium text-gray-700">
+                                🖼️ Image gen
+                                <span class="tooltip-container">
+                                    <span class="tooltip-icon">?</span>
+                                    <span class="tooltip-text">Creating original images based on text descriptions</span>
+                                </span>
+                            </td>
+                            <td class="p-3 text-center best-cell chatgpt"><span class="indicator-star star-chatgpt"><svg><use href="#icon-star" /></svg></span></td>
+                            <td class="p-3 text-center"><span class="indicator indicator-no"><svg><use href="#icon-x" /></svg></span></td>
+                            <td class="p-3 text-center"><span class="indicator indicator-yes"><svg><use href="#icon-check" /></svg></span></td>
+                            <td class="p-3 text-center"><span class="indicator indicator-yes"><svg><use href="#icon-check" /></svg></span></td>
+                            <td class="p-3 text-center"><span class="indicator indicator-no"><svg><use href="#icon-x" /></svg></span></td>
+                        </tr>
+                        <tr class="hover:bg-amber-50 transition-colors duration-150 ease-in-out data-row" data-category="multimodal">
+                            <td class="sticky-col-light p-3 font-medium text-gray-700">
+                                🎬 Video gen
+                                <span class="tooltip-container">
+                                    <span class="tooltip-icon">?</span>
+                                    <span class="tooltip-text">Creating short videos or animations from text descriptions</span>
+                                </span>
+                            </td>
+                             <td class="p-3 text-center"><span class="indicator indicator-yes"><svg><use href="#icon-check" /></svg></span></td>
+                             <td class="p-3 text-center"><span class="indicator indicator-no"><svg><use href="#icon-x" /></svg></span></td>
+                             <td class="p-3 text-center"><span class="indicator indicator-no"><svg><use href="#icon-x" /></svg></span></td>
+                             <td class="p-3 text-center best-cell gemini"><span class="indicator-star star-gemini"><svg><use href="#icon-star" /></svg></span></td>
+                             <td class="p-3 text-center"><span class="indicator indicator-no"><svg><use href="#icon-x" /></svg></span></td>
+                        </tr>
+                        
+                        <!-- CATEGORY: Advanced Interaction -->
+                        <tr class="category-row" data-category="advanced">
+                            <td colspan="6" class="sticky-col-light category-advanced p-2 font-semibold text-left category-text">ADVANCED INTERACTION</td>
+                        </tr>
+                        <tr class="hover:bg-purple-50 transition-colors duration-150 ease-in-out data-row" data-category="advanced">
+                            <td class="sticky-col-light p-3 font-medium text-gray-700">
+                                📷 Live camera
+                                <span class="tooltip-container">
+                                    <span class="tooltip-icon">?</span>
+                                    <span class="tooltip-text">Using camera to show the AI what you're looking at in real-time</span>
+                                </span>
+                            </td>
+                            <td class="p-3 text-center best-cell chatgpt"><span class="indicator-star star-chatgpt"><svg><use href="#icon-star" /></svg></span></td>
+                            <td class="p-3 text-center"><span class="indicator indicator-no"><svg><use href="#icon-x" /></svg></span></td>
+                            <td class="p-3 text-center"><span class="indicator indicator-no"><svg><use href="#icon-x" /></svg></span></td>
+                            <td class="p-3 text-center"><span class="indicator indicator-yes"><svg><use href="#icon-check" /></svg></span></td>
+                            <td class="p-3 text-center"><span class="indicator indicator-no"><svg><use href="#icon-x" /></svg></span></td>
+                        </tr>
+                        <tr class="hover:bg-purple-50 transition-colors duration-150 ease-in-out data-row" data-category="advanced">
+                            <td class="sticky-col-light p-3 font-medium text-gray-700">
+                                🖱️ Computer use
+                                <span class="tooltip-container">
+                                    <span class="tooltip-icon">?</span>
+                                    <span class="tooltip-text">AI can see and interact with your screen to help with tasks</span>
+                                </span>
+                            </td>
+                             <td class="p-3 text-center best-cell chatgpt"><span class="indicator-star star-chatgpt"><svg><use href="#icon-star" /></svg></span></td>
+                             <td class="p-3 text-center"><span class="indicator indicator-yes"><svg><use href="#icon-check" /></svg></span></td>
+                             <td class="p-3 text-center"><span class="indicator indicator-no"><svg><use href="#icon-x" /></svg></span></td>
+                             <td class="p-3 text-center"><span class="indicator indicator-no"><svg><use href="#icon-x" /></svg></span></td>
+                             <td class="p-3 text-center"><span class="indicator indicator-no"><svg><use href="#icon-x" /></svg></span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Quick Summary Section -->
+            <div class="mt-8 mb-2 text-sm text-slate-300 grid grid-cols-1 md:grid-cols-5 gap-4">
+                <div class="p-3 rounded bg-slate-800/60 border border-slate-700/60">
+                    <h3 class="text-teal-400 font-medium mb-1">ChatGPT</h3>
+                    <p class="text-xs text-slate-400">Best overall for everyday use, image gen, and reasoning</p>
+                </div>
+                <div class="p-3 rounded bg-slate-800/60 border border-slate-700/60">
+                    <h3 class="text-amber-400 font-medium mb-1">Claude</h3>
+                    <p class="text-xs text-slate-400">Superior writing quality and document understanding</p>
+                </div>
+                <div class="p-3 rounded bg-slate-800/60 border border-slate-700/60">
+                    <h3 class="text-violet-400 font-medium mb-1">Grok</h3>
+                    <p class="text-xs text-slate-400">Good all-around capabilities with real-time information</p>
+                </div>
+                <div class="p-3 rounded bg-slate-800/60 border border-slate-700/60">
+                    <h3 class="text-blue-400 font-medium mb-1">Gemini</h3>
+                    <p class="text-xs text-slate-400">Excels at coding and video generation</p>
+                </div>
+                <div class="p-3 rounded bg-slate-800/60 border border-slate-700/60">
+                    <h3 class="text-emerald-400 font-medium mb-1">Perplexity</h3>
+                    <p class="text-xs text-slate-400">Best for research and web search integration</p>
+                </div>
+            </div>
+
+            <div class="text-center text-xs text-slate-400/80 mt-6">
+                <p>Last Updated: <span id="update-date" class="font-medium text-slate-300">May 2024</span></p>
+                <p class="mt-1">Source: creatoreconomy.so | Found an error? <a href="#" class="text-sky-400 hover:text-sky-300">Let us know!</a></p>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        // Set the update date to current month and year
+        document.addEventListener('DOMContentLoaded', function() {
+            const now = new Date();
+            const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+            document.getElementById('update-date').textContent = months[now.getMonth()] + ' ' + now.getFullYear();
+        });
+
+        // Filter functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const buttons = document.querySelectorAll('.filter-button');
+            buttons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const category = this.getAttribute('data-category');
+                    if (category === 'all') {
+                        // Show all rows
+                        document.querySelectorAll('.category-row').forEach(row => row.style.display = '');
+                        document.querySelectorAll('.data-row').forEach(row => row.style.display = '');
+                    } else {
+                        // Show only rows matching the selected category
+                        document.querySelectorAll(`.category-row[data-category="${category}"]`).forEach(row => row.style.display = '');
+                        document.querySelectorAll(`.data-row[data-category="${category}"]`).forEach(row => row.style.display = '');
+                    }
+                });
+            });
+            
+            // Initialize with all categories shown
+            document.querySelector('.filter-button[data-category="all"]').classList.add('active');
+        });
+        
+        // Function to make capability cells more accessible with keyboard navigation
+        document.addEventListener('DOMContentLoaded', function() {
+            const cells = document.querySelectorAll('.indicator');
+            cells.forEach(cell => {
+                cell.setAttribute('tabindex', '0');
+                cell.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        // Trigger the same visual effect as hover
+                        this.classList.add('pressed');
+                        setTimeout(() => {
+                            this.classList.remove('pressed');
+                        }, 200);
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
