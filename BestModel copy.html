@@ -234,74 +234,6 @@
                 A simple comparison of what each AI assistant does best. Updated <span id="update-date">Monthly</span>.
             </p>
 
-            <!-- Quick Reference Cards - NEW SECTION -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-10">
-                <!-- ChatGPT Card -->
-                <div class="quick-card">
-                    <div class="flex items-center gap-3 mb-2">
-                        <div class="ai-logo" style="background-color: #d1fae5; color: #065f46;">C</div>
-                        <h3 class="font-semibold text-lg">ChatGPT</h3>
-                    </div>
-                    <div class="space-y-2 mb-3">
-                        <div><span class="indicator-best">⭐</span> General Assistant</div>
-                        <div><span class="indicator-best">⭐</span> Image Creation</div>
-                    </div>
-                    <div><span class="best-for-tag bg-green-100 text-green-800">Best For: Everyday Use</span></div>
-                </div>
-                
-                <!-- Claude Card -->
-                <div class="quick-card">
-                    <div class="flex items-center gap-3 mb-2">
-                        <div class="ai-logo" style="background-color: #ffedd5; color: #9a3412;">C</div>
-                        <h3 class="font-semibold text-lg">Claude</h3>
-                    </div>
-                    <div class="space-y-2 mb-3">
-                        <div><span class="indicator-best">⭐</span> Long Documents</div>
-                        <div><span class="indicator-best">⭐</span> Writing</div>
-                    </div>
-                    <div><span class="best-for-tag bg-orange-100 text-orange-800">Best For: Documents</span></div>
-                </div>
-                
-                <!-- Gemini Card -->
-                <div class="quick-card">
-                    <div class="flex items-center gap-3 mb-2">
-                        <div class="ai-logo" style="background-color: #dbeafe; color: #1e40af;">G</div>
-                        <h3 class="font-semibold text-lg">Gemini</h3>
-                    </div>
-                    <div class="space-y-2 mb-3">
-                        <div><span class="indicator-best">⭐</span> Coding</div>
-                        <div><span class="indicator-best">⭐</span> Video Creation</div>
-                    </div>
-                    <div><span class="best-for-tag bg-blue-100 text-blue-800">Best For: Developers</span></div>
-                </div>
-                
-                <!-- Perplexity Card -->
-                <div class="quick-card">
-                    <div class="flex items-center gap-3 mb-2">
-                        <div class="ai-logo" style="background-color: #ccfbf1; color: #0f766e;">P</div>
-                        <h3 class="font-semibold text-lg">Perplexity</h3>
-                    </div>
-                    <div class="space-y-2 mb-3">
-                        <div><span class="indicator-best">⭐</span> Web Search</div>
-                        <div><span class="indicator-best">⭐</span> Research</div>
-                    </div>
-                    <div><span class="best-for-tag bg-teal-100 text-teal-800">Best For: Research</span></div>
-                </div>
-                
-                <!-- Grok Card -->
-                <div class="quick-card">
-                    <div class="flex items-center gap-3 mb-2">
-                        <div class="ai-logo" style="background-color: #f3e8ff; color: #7e22ce;">G</div>
-                        <h3 class="font-semibold text-lg">Grok</h3>
-                    </div>
-                    <div class="space-y-2 mb-3">
-                        <div><span class="indicator">✅</span> Web Access</div>
-                        <div><span class="indicator">✅</span> Personality</div>
-                    </div>
-                    <div><span class="best-for-tag bg-purple-100 text-purple-800">Best For: X Users</span></div>
-                </div>
-            </div>
-
             <!-- Legend with improved styling -->
             <div class="text-center text-gray-600 mb-6 text-sm flex flex-wrap justify-center items-center gap-x-6 gap-y-3 p-4 bg-gray-50 rounded-xl" id="legend">
                 <span class="inline-flex items-center gap-2 legend-item" data-type="best">
@@ -478,6 +410,75 @@
                         </tr>
                     </tbody>
                 </table>
+            </div>
+
+            <!-- AI Model Cards section - MOVED TO AFTER THE TABLE -->
+            <div class="mb-8">
+                <h2 class="text-xl font-semibold text-slate-800 mb-4 text-center">Quick Guide: Which AI Does What Best</h2>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+                    <!-- ChatGPT Card -->
+                    <div class="model-card border shadow-sm">
+                        <div class="model-card-header ai-header chatgpt">ChatGPT</div>
+                        <div class="model-card-body">
+                            <div class="mb-2">
+                                <span class="best-for-tag">💻 Computer Use</span>
+                                <span class="best-for-tag">🖼️ Image Generation</span>
+                                <span class="best-for-tag">📷 Live Camera</span>
+                            </div>
+                            <p class="text-sm text-slate-600">Best overall for image creation and desktop control. Highly versatile for everyday tasks.</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Claude Card -->
+                    <div class="model-card border shadow-sm">
+                        <div class="model-card-header ai-header claude">Claude</div>
+                        <div class="model-card-body">
+                            <div class="mb-2">
+                                <span class="best-for-tag">✍️ Writing</span>
+                                <span class="best-for-tag">📊 Analysis</span>
+                                <span class="best-for-tag">📝 Long Content</span>
+                            </div>
+                            <p class="text-sm text-slate-600">Excels at writing, document analysis, and handling long-form content with nuance.</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Grok Card -->
+                    <div class="model-card border shadow-sm">
+                        <div class="model-card-header ai-header grok">Grok</div>
+                        <div class="model-card-body">
+                            <div class="mb-2">
+                                <span class="best-for-tag">🌐 Web Access</span>
+                                <span class="best-for-tag">📰 News</span>
+                            </div>
+                            <p class="text-sm text-slate-600">Specializes in real-time information and offers a unique perspective with its conversational style.</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Gemini Card -->
+                    <div class="model-card border shadow-sm">
+                        <div class="model-card-header ai-header gemini">Gemini</div>
+                        <div class="model-card-body">
+                            <div class="mb-2">
+                                <span class="best-for-tag">🧠 Reasoning</span>
+                                <span class="best-for-tag">🎬 Video Creation</span>
+                                <span class="best-for-tag">🔍 Search</span>
+                            </div>
+                            <p class="text-sm text-slate-600">Strong multi-modal capabilities with excellent reasoning and groundbreaking video generation.</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Perplexity Card -->
+                    <div class="model-card border shadow-sm">
+                        <div class="model-card-header ai-header perplexity">Perplexity</div>
+                        <div class="model-card-body">
+                            <div class="mb-2">
+                                <span class="best-for-tag">🔎 Research</span>
+                                <span class="best-for-tag">📊 Data Analysis</span>
+                            </div>
+                            <p class="text-sm text-slate-600">Exceptional for detailed research tasks with direct citations and up-to-date information.</p>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <!-- Footer with cleaner styling -->
